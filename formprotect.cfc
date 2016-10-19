@@ -1,13 +1,13 @@
 <cfcomponent mixin="controller" output="false">
-    
+
   <cffunction name="init" access="public" output="false" returntype="any">
     <cfscript>
       var loc = {};
 
       _addSettings();
 
-      this.version = "1.1.7,1.1.8"; 
-      
+      this.version = "1.1.7,1.1.8,1.4.5";
+
       loc.settings = application.wheels.formprotect;
 
       // add in the formprotect.js file for when we are in design / develop / maintenance environments
