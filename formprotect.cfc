@@ -153,7 +153,7 @@
         , maxpoints     = 3
       };
 
-      if (!structKeyExists(application.wheels, "formprotect"))
+      if (!structKeyExists(application, "wheels") || !structKeyExists(application.wheels, "formprotect"))
         application.wheels.formprotect = loc.settings;
     </cfscript>
   </cffunction>
