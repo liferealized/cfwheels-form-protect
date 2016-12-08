@@ -8,7 +8,7 @@
 
       this.version = "1.1.7,1.1.8,1.4.5";
 
-      loc.settings = application.wheels.formprotect;
+      loc.settings = application.formprotect;
 
       // add in the formprotect.js file for when we are in design / develop / maintenance environments
       if (!FileExists(ExpandPath("javascripts/#loc.settings.jsfilename#")))
@@ -20,7 +20,7 @@
   <!--- controller helpers --->
 
   <cffunction name="verifyFormProtection" access="public" output="false" returntype="boolean">
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfscript>
       var loc = { points = 0 };
 
@@ -36,19 +36,19 @@
 
   <cffunction name="verifyMouseMovement" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfreturn (structKeyExists(arguments.params, "formfield1234567891") and isNumeric(arguments.params.formfield1234567891)) ? 0 : arguments.settings.mousemovement.points />
   </cffunction>
 
   <cffunction name="verifyKeyboardUsed" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfreturn (structKeyExists(arguments.params, "formfield1234567892") and isNumeric(arguments.params.formfield1234567892)) ? 0 : arguments.settings.keyboardused.points />
   </cffunction>
 
   <cffunction name="verifyTimedTest" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfscript>
       var loc = {};
 
@@ -72,30 +72,30 @@
 
   <cffunction name="verifyNegativeTest" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfreturn (structKeyExists(arguments.params, "formfield1234567894") and !len(arguments.params.formfield1234567894)) ? 0 : arguments.settings.negativetest.points />
   </cffunction>
 
   <cffunction name="verifySpamStrings" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfreturn (reFindNoCase(arguments.settings.spamstrings.regex, serializeJSON(arguments.params))) ? arguments.settings.spamstrings.points : 0 />
   </cffunction>
 
   <cffunction name="verifyUrlCount" access="public" output="false" returntype="numeric">
     <cfargument name="params" type="struct" required="false" default="#variables.params#" />
-    <cfargument name="settings" type="struct" required="false" default="#get('formprotect')#" />
+    <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfreturn (arrayLen(reMatch("http://|https://", serializeJSON(arguments.params))) gt arguments.settings.urlcount.max) ? arguments.settings.urlcount.points : 0 />
   </cffunction>
 
   <!--- view helpers --->
 
-  <cffunction name="startProtectedFormTag" access="public" output="false" returntype="string">
+  <cffunction name="startFormTag" access="public" output="false" returntype="string">
     <cfset var loc = {} />
     <!--- use savecontent so the html written isn't just one long string --->
     <cfsavecontent variable="loc.formStart">
       <cfoutput>
-        #startFormTag(argumentCollection=arguments)#
+        #core.startFormTag(argumentCollection=arguments)#
 
         #mouseMovementHiddenTag()#
         #keyboardUsedHiddenTag()#
@@ -117,8 +117,8 @@
   <cffunction name="timedTestHiddenTag" access="public" output="false" returntype="string">
     <cfscript>
       var loc = {
-          date = dateFormat(now(), "yyyymmdd") + get("formprotect").timesecret
-        , time = timeFormat(now(), "HHmmss") + get("formprotect").timesecret
+          date = dateFormat(now(), "yyyymmdd") + application.formprotect.timesecret
+        , time = timeFormat(now(), "HHmmss") + application.formprotect.timesecret
       };
     </cfscript>
     <cfreturn hiddenFieldTag(name="formfield1234567893", id=createUUID(), value=loc.date & "," & loc.time) />
@@ -130,7 +130,7 @@
       loc.label = $element(name="label", content="Leave this field empty", attributes={ for=loc.id });
       loc.field = textFieldTag(name="formfield1234567894", id=loc.id, value="");
     </cfscript>
-    <cfreturn $element(name="span", content=loc.label & loc.field, attributes={ style=get("formprotect").hidestyle }) />
+    <cfreturn $element(name="span", content=loc.label & loc.field, attributes={ style=application.formprotect.hidestyle }) />
   </cffunction>
 
   <!--- private methods --->
@@ -153,8 +153,8 @@
         , maxpoints     = 3
       };
 
-      if (!structKeyExists(application, "wheels") || !structKeyExists(application.wheels, "formprotect"))
-        application.wheels.formprotect = loc.settings;
+      if (!structKeyExists(application, "formprotect"))
+        application.formprotect = loc.settings;
     </cfscript>
   </cffunction>
 
