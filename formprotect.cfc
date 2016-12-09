@@ -17,21 +17,33 @@
     <cfreturn this />
   </cffunction>
 
+  <cffunction name="protectForms" access="public" output="false" returntype="void">
+    <cfscript>
+      filters(type="before", through="verifyFormProtection");
+    </cfscript>
+  </cffunction>
+
   <!--- controller helpers --->
 
-  <cffunction name="verifyFormProtection" access="public" output="false" returntype="boolean">
+  <cffunction name="verifyFormProtection" access="public" output="false" returntype="void">
     <cfargument name="settings" type="struct" required="false" default="#application.formprotect#" />
     <cfscript>
       var loc = { points = 0 };
+
+      if (isGet() || isHead() || isOptions())
+        return;
 
       for (loc.setting in arguments.settings)
         if (isStruct(arguments.settings) and structKeyExists(variables, "verify" & loc.setting))
           loc.points += $invoke(method="verify" & loc.setting);
 
       if (loc.points gte arguments.settings.maxpoints)
-        return false;
+        $throw(
+          type="Wheels.formprotect.FormFailed",
+          message = "The form failed our sanity checks with #loc.points# points which exceeds the threshold of #arguments.settings.maxpoints#."
+        );
     </cfscript>
-    <cfreturn true />
+    <cfreturn />
   </cffunction>
 
   <cffunction name="verifyMouseMovement" access="public" output="false" returntype="numeric">
