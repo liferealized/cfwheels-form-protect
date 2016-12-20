@@ -139,10 +139,9 @@
   <cffunction name="negativeTestHiddenField" access="public" output="false" returntype="string">
     <cfscript>
       var loc = { id = createUUID() };
-      loc.label = $element(name="label", content="Leave this field empty", attributes={ for=loc.id });
-      loc.field = textFieldTag(name="formfield1234567894", id=loc.id, value="");
+      loc.field = textFieldTag(name="formfield1234567894", id=loc.id, value="", label="Leave this field empty");
     </cfscript>
-    <cfreturn $element(name="span", content=loc.label & loc.field, attributes={ style=application.formprotect.hidestyle }) />
+    <cfreturn $element(name="span", content=loc.field, attributes={ style=application.formprotect.hidestyle }) />
   </cffunction>
 
   <!--- private methods --->
